@@ -10,19 +10,18 @@ type TapDevice struct {
 	dev *tuntap.Interface
 }
 
-func NewTapDevice() *TapDevice {
+func NewTapDevice(mac string) *TapDevice {
 	fd, err := tuntap.Open("tap0", tuntap.DevTap)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Print("Name:", fd.Name())
 
 	ip_path, err := exec.LookPath("ip")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	cmd := exec.Command(ip_path, "link", "set", "dev", "tap0", "address", "00:24:d7:3e:71:b4")
+	cmd := exec.Command(ip_path, "link", "set", "dev", "tap0", "address", mac)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Print(string(output))
@@ -52,4 +51,11 @@ func (t *TapDevice) ReadPacket() []byte {
 		log.Fatal(err)
 	}
 	return p.Packet
+}
+
+func (t *TapDevice) WritePacket(data []byte) {
+	t.dev.WritePacket(
+		&tuntap.Packet{
+			Protocol: EthPacket(data).TypeInt(),
+			Packet:   data})
 }

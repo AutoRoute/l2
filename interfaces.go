@@ -10,9 +10,6 @@ type PacketWriter interface {
 
 type PacketDevice interface {
 	PacketReader
-	Device
-}
-
-type Device interface {
+	PacketWriter
 	Name() string
 }
