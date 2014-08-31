@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"errors"
 	"log"
 )
 
@@ -9,16 +10,18 @@ type PacketLogger struct {
 	d PacketDevice
 }
 
-func (l PacketLogger) ReadPacket() []byte {
+func (l PacketLogger) ReadPacket() ([]byte, error) {
 	for {
-		p := l.d.ReadPacket()
-		PrintPacket(l.d.Name(), p)
-		return p
+		p, err := l.d.ReadPacket()
+		if err == nil {
+			PrintPacket(l.d.Name(), p)
+		}
+		return p, err
 	}
 }
 
-func (l PacketLogger) WritePacket([]byte) {
-	panic("ERROR")
+func (l PacketLogger) WritePacket([]byte) error {
+	return errors.New("This interface cannot write")
 }
 
 func (l PacketLogger) Name() string {

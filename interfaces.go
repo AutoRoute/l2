@@ -1,15 +1,29 @@
 package main
 
 type PacketReader interface {
-	ReadPacket() []byte
+	ReadPacket() ([]byte, error)
 }
 
 type PacketWriter interface {
-	WritePacket([]byte)
+	WritePacket([]byte) error
+}
+
+type Namer interface {
+	Name() string
 }
 
 type PacketDevice interface {
 	PacketReader
 	PacketWriter
-	Name() string
+	Namer
+}
+
+type PacketReaderDevice interface {
+	PacketReader
+	Namer
+}
+
+type PacketWriterDevice interface {
+	PacketWriter
+	Namer
 }

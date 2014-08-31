@@ -6,24 +6,29 @@ import (
 
 type FilterPacket struct {
 	mac    []byte
-	reader PacketDevice
+	device PacketDevice
 }
 
-func (f FilterPacket) ReadPacket() []byte {
+func (f FilterPacket) ReadPacket() ([]byte, error) {
 	for {
-		p := f.reader.ReadPacket()
+		p, err := f.device.ReadPacket()
+        if err != nil {
+            return nil, err
+        }
 		if bytes.Equal(EthPacket(p).Destination(), f.mac) {
-			return p
+			return p, nil
 		}
 		broadcast := MAC("ff:ff:ff:ff:ff:ff").ToBytes()
 		if bytes.Equal(EthPacket(p).Destination(), broadcast) {
-			return p
+			return p, nil
 		}
 	}
 }
 
-func (f FilterPacket) WritePacket(data []byte) {}
+func (f FilterPacket) WritePacket(data []byte) error{
+    return f.device.WritePacket(data)
+}
 
 func (f FilterPacket) Name() string {
-	return "wrapped: " + f.reader.Name()
+	return "wrapped: " + f.device.Name()
 }

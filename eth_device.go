@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"errors"
 	"net"
 	"unsafe"
 )
@@ -38,50 +38,56 @@ func (e *EthDevice) Name() string {
 	return e.name
 }
 
-func ConnectEthDevice(device string) *EthDevice {
+func ConnectEthDevice(device string) (*EthDevice, error) {
 	sock, err := C.socket(C.AF_PACKET, C.SOCK_RAW, C.int(C.htons(C.ETH_P_ALL)))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	ll_addr := C.struct_sockaddr_ll{}
 	i, err := net.InterfaceByName(device)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	ll_addr.sll_family = C.AF_PACKET
 	ll_addr.sll_ifindex = C.int(i.Index)
 	ll_addr.sll_protocol = C.__be16(C.htons(C.ETH_P_ALL))
 	ll_addr.sll_pkttype = C.PACKET_HOST | C.PACKET_BROADCAST
 	ok, err := C.bind(sock, (*C.struct_sockaddr)(unsafe.Pointer(&ll_addr)), C.LLSize())
-	if ok != 0 || err != nil {
-		log.Print("Error setting up eth device", device)
-		log.Fatal(err)
+	if err != nil {
+		return nil, err
 	}
-	return &EthDevice{sock, device, C.int(i.Index)}
+	if ok != 0 {
+		return nil, errors.New("bind return !ok")
+	}
+	return &EthDevice{sock, device, C.int(i.Index)}, nil
 }
 
-func (e *EthDevice) ReadPacket() []byte {
+func (e *EthDevice) ReadPacket() ([]byte, error) {
 	buffer := [1523]byte{}
 	n, err := C.recvfrom(e.dev, unsafe.Pointer(&buffer[0]), C.size_t(1523), 0, nil, nil)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return buffer[0:n]
+	return buffer[0:n], nil
 }
 
-func (e *EthDevice) WritePacket(data []byte) {
+func (e *EthDevice) WritePacket(data []byte) error {
 	socket_address := C.struct_sockaddr_ll{}
 	socket_address.sll_ifindex = e.num
 	socket_address.sll_halen = C.ETH_ALEN
 	_, err := C.memcpy(unsafe.Pointer(&socket_address.sll_addr[0]),
 		unsafe.Pointer(&data[0]), C.ETH_ALEN)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	ok, err := C.sendto(e.dev, unsafe.Pointer(&data[0]), C.size_t(len(data)),
+	n, err := C.sendto(e.dev, unsafe.Pointer(&data[0]), C.size_t(len(data)),
 		0, (*C.struct_sockaddr)(unsafe.Pointer(&socket_address)), C.LLSize())
-	if ok != 0 || err != nil {
-		log.Fatal(err)
+	if err != nil {
+		return err
 	}
+    if int(n) != len(data) {
+        return errors.New("sent less data then len(data)")
+    }
+    return nil
 }

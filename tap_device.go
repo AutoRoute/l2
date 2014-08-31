@@ -10,31 +10,31 @@ type TapDevice struct {
 	dev *tuntap.Interface
 }
 
-func NewTapDevice(mac string) *TapDevice {
-	fd, err := tuntap.Open("tap0", tuntap.DevTap)
+func NewTapDevice(mac, dev string) (*TapDevice, error) {
+	fd, err := tuntap.Open(dev, tuntap.DevTap)
 	if err != nil {
-		log.Fatal(err)
+        return nil, err
 	}
 
 	ip_path, err := exec.LookPath("ip")
 	if err != nil {
-		log.Fatal(err)
+        return nil, err
 	}
 
-	cmd := exec.Command(ip_path, "link", "set", "dev", "tap0", "address", mac)
+	cmd := exec.Command(ip_path, "link", "set", "dev", dev, "address", mac)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Print(string(output))
-		log.Fatal(err.Error())
+        log.Print("Command output:", string(output))
+        return nil, err
 	}
 
-	cmd = exec.Command(ip_path, "link", "set", "dev", "tap0", "up")
+	cmd = exec.Command(ip_path, "link", "set", "dev", dev, "up")
 	output, err = cmd.CombinedOutput()
 	if err != nil {
-		log.Print(string(output))
-		log.Fatal(err.Error())
+        log.Print("Command output:", string(output))
+        return nil, err
 	}
-	return &TapDevice{fd}
+	return &TapDevice{fd}, nil
 }
 
 func (t *TapDevice) Name() string {
@@ -45,17 +45,18 @@ func (t *TapDevice) Close() {
 	t.dev.Close()
 }
 
-func (t *TapDevice) ReadPacket() []byte {
+func (t *TapDevice) ReadPacket() ([]byte, error) {
 	p, err := t.dev.ReadPacket()
 	if err != nil {
-		log.Fatal(err)
+        return nil, err
 	}
-	return p.Packet
+	return p.Packet, nil
 }
 
-func (t *TapDevice) WritePacket(data []byte) {
+func (t *TapDevice) WritePacket(data []byte) error {
 	t.dev.WritePacket(
 		&tuntap.Packet{
 			Protocol: EthPacket(data).TypeInt(),
 			Packet:   data})
+    return nil
 }
