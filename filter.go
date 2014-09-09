@@ -12,9 +12,9 @@ type FilterPacket struct {
 func (f FilterPacket) ReadPacket() ([]byte, error) {
 	for {
 		p, err := f.device.ReadPacket()
-        if err != nil {
-            return nil, err
-        }
+		if err != nil {
+			return nil, err
+		}
 		if bytes.Equal(EthPacket(p).Destination(), f.mac) {
 			return p, nil
 		}
@@ -25,8 +25,8 @@ func (f FilterPacket) ReadPacket() ([]byte, error) {
 	}
 }
 
-func (f FilterPacket) WritePacket(data []byte) error{
-    return f.device.WritePacket(data)
+func (f FilterPacket) WritePacket(data []byte) error {
+	return f.device.WritePacket(data)
 }
 
 func (f FilterPacket) Name() string {

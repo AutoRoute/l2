@@ -78,8 +78,8 @@ func (e *EthDevice) WritePacket(data []byte) error {
 	if err != nil {
 		return err
 	}
-    if int(n) != len(data) {
-        return errors.New("sent less data then len(data)")
-    }
-    return nil
+	if int(n) != len(data) {
+		return errors.New("sent less data then len(data)")
+	}
+	return nil
 }

@@ -1,45 +1,45 @@
 package main
 
 import (
-    "testing"
-    "bytes"
-    "time"
-    "log"
+	"bytes"
+	"log"
+	"testing"
+	"time"
 )
 
 func waitForPacket(target []byte, dev PacketDevice) bool {
-    done := make(chan struct{})
-    found := make(chan struct{})
-    go func() {
-        for {
-            select{
-            case <- done:
-                return
-            default:
-            }
+	done := make(chan struct{})
+	found := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			default:
+			}
 
-            pack, err := dev.ReadPacket()
-            if err != nil {
-                log.Fatal(err)
-            }
-            if bytes.Equal(target, pack) {
-                found <- struct{}{}
-                return
-            }
-            PrintPacket("desired", target)
-            PrintPacket("found", pack)
-        }
-    }()
-    
-    timeout := time.After(time.Second)
+			pack, err := dev.ReadPacket()
+			if err != nil {
+				log.Fatal(err)
+			}
+			if bytes.Equal(target, pack) {
+				found <- struct{}{}
+				return
+			}
+			PrintPacket("desired", target)
+			PrintPacket("found", pack)
+		}
+	}()
 
-    select {
-        case <- timeout:
-            done <- struct{}{}
-            return false
-        case <- found:
-            return true
-    }
+	timeout := time.After(time.Second)
+
+	select {
+	case <-timeout:
+		done <- struct{}{}
+		return false
+	case <-found:
+		return true
+	}
 }
 
 func TestEthToTap(t *testing.T) {
@@ -63,7 +63,7 @@ func TestEthToTap(t *testing.T) {
 		t.Fatal(err)
 	}
 
-    waitForPacket(packet, tap)
+	waitForPacket(packet, tap)
 }
 
 func TestTapToEth(t *testing.T) {
@@ -87,5 +87,5 @@ func TestTapToEth(t *testing.T) {
 		t.Fatal(err)
 	}
 
-    waitForPacket(packet, eth_tap)
+	waitForPacket(packet, eth_tap)
 }

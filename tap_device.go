@@ -13,26 +13,26 @@ type TapDevice struct {
 func NewTapDevice(mac, dev string) (*TapDevice, error) {
 	fd, err := tuntap.Open(dev, tuntap.DevTap)
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 
 	ip_path, err := exec.LookPath("ip")
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 
 	cmd := exec.Command(ip_path, "link", "set", "dev", dev, "address", mac)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-        log.Print("Command output:", string(output))
-        return nil, err
+		log.Print("Command output:", string(output))
+		return nil, err
 	}
 
 	cmd = exec.Command(ip_path, "link", "set", "dev", dev, "up")
 	output, err = cmd.CombinedOutput()
 	if err != nil {
-        log.Print("Command output:", string(output))
-        return nil, err
+		log.Print("Command output:", string(output))
+		return nil, err
 	}
 	return &TapDevice{fd}, nil
 }
@@ -48,7 +48,7 @@ func (t *TapDevice) Close() {
 func (t *TapDevice) ReadPacket() ([]byte, error) {
 	p, err := t.dev.ReadPacket()
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 	return p.Packet, nil
 }
@@ -58,5 +58,5 @@ func (t *TapDevice) WritePacket(data []byte) error {
 		&tuntap.Packet{
 			Protocol: EthPacket(data).TypeInt(),
 			Packet:   data})
-    return nil
+	return nil
 }
