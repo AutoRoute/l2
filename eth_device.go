@@ -17,14 +17,6 @@ import (
 socklen_t LLSize() {
     return sizeof(struct sockaddr_ll);
 }
-
-int SendData(int socket, int interface, char * data, size_t length) {
-struct sockaddr_ll socket_address;
-socket_address.sll_ifindex = interface;
-socket_address.sll_halen = ETH_ALEN;
-memcpy(socket_address.sll_addr, data, ETH_ALEN);
-return sendto(socket, data, length, 0, (struct sockaddr*)&socket_address, LLSize());
-};
 */
 import "C"
 
