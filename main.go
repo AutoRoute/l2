@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+    "flag"
     "log"
 )
 
@@ -20,16 +21,24 @@ func SendPackets(source PacketReaderDevice, destination PacketWriterDevice) {
 }
 
 func main() {
-	mac := "00:24:d7:3e:71:b4"
+    source := "wlp3s0"
+    flag.StringVar(&source, "source", source, "source address to listen to")
+    mac := "00:24:d7:3e:71:b4"
+    flag.StringVar(&mac, "mac", mac,  "mac address to use")
+    destination := "wlan0"
+    flag.StringVar(&destination, "destination", destination, "new device to create")
+
 	macbyte := MAC(mac).ToBytes()
 
-	fd, err := NewTapDevice(mac, "wlan0")
+    flag.Parse()
+
+	fd, err := NewTapDevice(mac, destination)
     if err != nil {
         log.Fatal(err)
     }
 	defer fd.Close()
 
-	raw_eth, err := ConnectEthDevice("wlp3s0")
+	raw_eth, err := ConnectEthDevice(source)
     if err != nil {
         log.Fatal(err)
     }

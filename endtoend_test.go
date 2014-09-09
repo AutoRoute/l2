@@ -1,6 +1,46 @@
 package main
 
-import "testing"
+import (
+    "testing"
+    "bytes"
+    "time"
+    "log"
+)
+
+func waitForPacket(target []byte, dev PacketDevice) bool {
+    done := make(chan struct{})
+    found := make(chan struct{})
+    go func() {
+        for {
+            select{
+            case <- done:
+                return
+            default:
+            }
+
+            pack, err := dev.ReadPacket()
+            if err != nil {
+                log.Fatal(err)
+            }
+            if bytes.Equal(target, pack) {
+                found <- struct{}{}
+                return
+            }
+            PrintPacket("desired", target)
+            PrintPacket("found", pack)
+        }
+    }()
+    
+    timeout := time.After(time.Second)
+
+    select {
+        case <- timeout:
+            done <- struct{}{}
+            return false
+        case <- found:
+            return true
+    }
+}
 
 func TestEthToTap(t *testing.T) {
 	dev_name := "test0"
@@ -23,14 +63,7 @@ func TestEthToTap(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	newpacket, err := tap.ReadPacket()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(newpacket) != len(packet) {
-		t.Fatal("Packet length changed ", len(packet), " vs ", len(newpacket))
-	}
+    waitForPacket(packet, tap)
 }
 
 func TestTapToEth(t *testing.T) {
@@ -54,12 +87,5 @@ func TestTapToEth(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	newpacket, err := eth_tap.ReadPacket()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(newpacket) != len(packet) {
-		t.Fatal("Packet length changed ", len(packet), " vs ", len(newpacket))
-	}
+    waitForPacket(packet, eth_tap)
 }
