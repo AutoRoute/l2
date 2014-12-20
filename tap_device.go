@@ -56,7 +56,7 @@ func (t *TapDevice) ReadPacket() ([]byte, error) {
 func (t *TapDevice) WritePacket(data []byte) error {
 	t.dev.WritePacket(
 		&tuntap.Packet{
-			Protocol: EthPacket(data).TypeInt(),
+			Protocol: int(EthPacket(data).Type()),
 			Packet:   data})
 	return nil
 }

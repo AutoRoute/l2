@@ -28,10 +28,10 @@ func (l PacketLogger) String() string {
 
 func PrintPacket(name string, data []byte) {
 	E := EthPacket(data)
-	log.Printf("%s: %s->%s %d bytes protocol %s",
+	log.Printf("%s: %s->%s %d bytes protocol %d",
 		name,
 		hex.EncodeToString(E.Source()),
 		hex.EncodeToString(E.Destination()),
 		len(data),
-		hex.EncodeToString(E.Type()))
+		E.Type())
 }
