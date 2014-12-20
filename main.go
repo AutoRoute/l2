@@ -6,15 +6,15 @@ import (
 	"log"
 )
 
-func SendPackets(source PacketReaderDevice, destination PacketWriterDevice) {
+func SendPackets(source PacketReader, destination PacketWriter) {
 	for {
 		p, err := source.ReadPacket()
 		if err != nil {
-			log.Fatal("Failure to read from source", source.Name(), err.Error())
+			log.Fatal("Failure to read from source", source, err.Error())
 		}
 		err = destination.WritePacket(p)
 		if err != nil {
-			log.Fatal("Failure to write to", destination.Name(), err.Error())
+			log.Fatal("Failure to write to", destination, err.Error())
 		}
 
 	}
@@ -32,20 +32,20 @@ func main() {
 
 	flag.Parse()
 
-	fd, err := NewTapDevice(mac, destination)
+	tap, err := NewTapDevice(mac, destination)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer fd.Close()
+	defer tap.Close()
 
-	raw_eth, err := ConnectEthDevice(source)
+	eth, err := ConnectEthDevice(source)
 	if err != nil {
 		log.Fatal(err)
 	}
-	eth := FilterPacket{macbyte, raw_eth}
+	filtered_eth := FilterPacket{macbyte, eth}
 
-	go SendPackets(PacketLogger{fd}, eth)
-	go SendPackets(PacketLogger{eth}, fd)
+	go SendPackets(PacketLogger{tap}, eth)
+	go SendPackets(PacketLogger{filtered_eth}, tap)
 
 	fmt.Scanln()
 }

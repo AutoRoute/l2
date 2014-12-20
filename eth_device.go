@@ -26,8 +26,8 @@ type EthDevice struct {
 	num  C.int
 }
 
-func (e *EthDevice) Name() string {
-	return e.name
+func (e *EthDevice) String() string {
+	return "EthDevice{" + e.name + "}"
 }
 
 func ConnectEthDevice(device string) (*EthDevice, error) {

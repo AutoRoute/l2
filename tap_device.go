@@ -37,8 +37,8 @@ func NewTapDevice(mac, dev string) (*TapDevice, error) {
 	return &TapDevice{fd}, nil
 }
 
-func (t *TapDevice) Name() string {
-	return t.dev.Name()
+func (t *TapDevice) String() string {
+	return "TapDevice{" + t.dev.Name() + "}"
 }
 
 func (t *TapDevice) Close() {

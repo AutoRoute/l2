@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func waitForPacket(target []byte, dev PacketDevice) bool {
+func waitForPacket(target []byte, dev PacketReader) bool {
 	done := make(chan struct{})
 	found := make(chan struct{})
 	go func() {
