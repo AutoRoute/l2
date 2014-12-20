@@ -9,8 +9,8 @@ import (
 
 var (
 	dev_name = "test"
-	dev_mac  = "00:11:22:33:44:55:66"
-	dest_mac = "ff:11:22:33:44:55:66"
+	dev_mac  = "00:11:22:33:44:55"
+	dest_mac = "ff:11:22:33:44:55"
 )
 
 func waitForPacket(target []byte, dev PacketReader) bool {
@@ -52,7 +52,7 @@ func NewDevices() (*TapDevice, *EthDevice, error) {
 
 func NewPacket(dest, src string) []byte {
 	data := make([]byte, 100)
-	return NewEthPacket(MAC(dest).ToBytes(), MAC(src).ToBytes(), 1, data)
+	return NewEthPacket(MacToBytesOrDie(dest), MacToBytesOrDie(src), 1, data)
 }
 
 func TestEthToTap(t *testing.T) {

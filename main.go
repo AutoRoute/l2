@@ -28,7 +28,8 @@ func main() {
 	destination := "wlan0"
 	flag.StringVar(&destination, "destination", destination, "new device to create")
 
-	macbyte := MAC(mac).ToBytes()
+	macbyte := MacToBytesOrDie(mac)
+	broadcast := MacToBytesOrDie("ff:ff:ff:ff:ff:ff")
 
 	flag.Parse()
 
@@ -42,7 +43,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	filtered_eth := FilterPacket{macbyte, eth}
+	filtered_eth := NewFilterPacket(eth, broadcast, macbyte)
 
 	go SendPackets(PacketLogger{tap}, eth)
 	go SendPackets(PacketLogger{filtered_eth}, tap)

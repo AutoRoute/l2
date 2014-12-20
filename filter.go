@@ -6,27 +6,36 @@ import (
 	"fmt"
 )
 
+// FilterPacket is a PacketReader which only allows through packets which match the list of
+// packets is is supplied with.
 type FilterPacket struct {
-	mac    []byte
+	mac    [][]byte
 	device PacketReader
 }
 
+func NewFilterPacket(dev PacketReader, mac ...[]byte) *FilterPacket {
+	return &FilterPacket{mac, dev}
+}
+
 func (f FilterPacket) ReadPacket() ([]byte, error) {
-	broadcast := MAC("ff:ff:ff:ff:ff:ff").ToBytes()
 	for {
 		p, err := f.device.ReadPacket()
 		if err != nil {
 			return p, err
 		}
-		if bytes.Equal(EthPacket(p).Destination(), f.mac) {
-			return p, nil
-		}
-		if bytes.Equal(EthPacket(p).Destination(), broadcast) {
-			return p, nil
+		for _, mac := range f.mac {
+			if bytes.Equal(EthPacket(p).Destination(), mac) {
+				return p, nil
+			}
 		}
 	}
 }
 
 func (f FilterPacket) String() string {
-	return "FilterPacket{" + hex.EncodeToString(f.mac) + ", " + fmt.Sprint(f.device) + "}"
+	s := "FilterPacket{" + fmt.Sprint(f.device)
+	for _, mac := range f.mac {
+		s += ", " + hex.EncodeToString(mac)
+	}
+	s += "}"
+	return s
 }

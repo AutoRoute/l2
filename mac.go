@@ -6,12 +6,13 @@ import (
 	"strings"
 )
 
-type MAC string
-
-func (m MAC) ToBytes() []byte {
-	r, err := hex.DecodeString(strings.Replace(string(m), ":", "", -1))
+func MacToBytesOrDie(m string) []byte {
+	b, err := hex.DecodeString(strings.Replace(m, ":", "", -1))
 	if err != nil {
 		log.Fatal(err)
 	}
-	return r
+	if len(b) != 6 {
+		log.Fatal("Expected mac of length 6 bytes got ", len(b))
+	}
+	return b
 }
