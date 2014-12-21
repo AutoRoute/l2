@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-    "strings"
+	"strings"
 	"testing"
 )
 
@@ -21,13 +21,13 @@ func TestLogger(t *testing.T) {
 		t.Fatal("packet recieved is not what was sent")
 	}
 
-    // Make sure the error appears as well
+	// Make sure the error appears as well
 	p, err = logger.ReadPacket()
 	if err == nil {
 		t.Fatal("Expected error")
 	}
 
-    if !strings.Contains(logger.String(), "Logger") {
-        t.Fatal("Expected to see type name in string rep", logger.String())
-    }
+	if !strings.Contains(logger.String(), "Logger") {
+		t.Fatal("Expected to see type name in string rep", logger.String())
+	}
 }

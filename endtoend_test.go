@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"log"
-    "strings"
+	"strings"
 	"testing"
 	"time"
 )
@@ -89,10 +89,10 @@ func TestPrinting(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tap.Close()
-    if !strings.Contains(tap.String(), "TapDevice") {
-        t.Fatal("Missing TapDevice from", tap.String())
-    }
-    if !strings.Contains(eth.String(), "EthDevice") {
-        t.Fatal("Missing EthDevice from", eth.String())
-    }
+	if !strings.Contains(tap.String(), "TapDevice") {
+		t.Fatal("Missing TapDevice from", tap.String())
+	}
+	if !strings.Contains(eth.String(), "EthDevice") {
+		t.Fatal("Missing EthDevice from", eth.String())
+	}
 }

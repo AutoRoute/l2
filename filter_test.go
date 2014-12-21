@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-    "strings"
+	"strings"
 	"testing"
 )
 
@@ -34,11 +34,11 @@ func TestFilter(t *testing.T) {
 		t.Fatal("Expected error")
 	}
 
-    // Make sure that the printing works correctly
-    if !strings.Contains(filter.String(), "000000000000") {
-        t.Fatal("Expected to see address in string rep", filter.String())
-    }
-    if !strings.Contains(filter.String(), "FilterPacket") {
-        t.Fatal("Expected to see name in string rep", filter.String())
-    }
+	// Make sure that the printing works correctly
+	if !strings.Contains(filter.String(), "000000000000") {
+		t.Fatal("Expected to see address in string rep", filter.String())
+	}
+	if !strings.Contains(filter.String(), "FilterPacket") {
+		t.Fatal("Expected to see name in string rep", filter.String())
+	}
 }
