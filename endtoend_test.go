@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"log"
+    "strings"
 	"testing"
 	"time"
 )
@@ -81,4 +82,17 @@ func TestTapToEth(t *testing.T) {
 		t.Fatal(err)
 	}
 	waitForPacket(packet, eth)
+}
+func TestPrinting(t *testing.T) {
+	tap, eth, err := NewDevices()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tap.Close()
+    if !strings.Contains(tap.String(), "TapDevice") {
+        t.Fatal("Missing TapDevice from", tap.String())
+    }
+    if !strings.Contains(eth.String(), "EthDevice") {
+        t.Fatal("Missing EthDevice from", eth.String())
+    }
 }

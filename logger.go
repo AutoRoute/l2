@@ -16,7 +16,7 @@ func (l PacketLogger) ReadPacket() ([]byte, error) {
 		if err == nil {
 			PrintPacket(fmt.Sprint(l.d), p)
 		} else {
-			log.Printf("Err reading packet:", err)
+			log.Print("Err reading packet:", err)
 		}
 		return p, err
 	}
