@@ -49,28 +49,47 @@ func SendPackets(source PacketReader, destination PacketWriter) {
 }
 
 func main() {
-	source := flag.String("source", "wlp3s0", "source address to listen to")
-	mac := flag.String("mac", "00:24:d7:3e:71:b4", "mac address to use")
-	destination := flag.String("destination", "wlan0", "new device to create")
+	dev := flag.String("dev", "wlan0", "Device to create/attach to")
+	mac := flag.String("mac", "e8:b1:fc:07:fa:3f", "mac address to use")
+	broadcast := flag.String("broadcast", "", "Address to listen on (mutually exclusive with -connect)")
+	connect := flag.String("connect", "", "Address to connect to (mutually exclusive with -broadcast)")
 	flag.Parse()
 
+	if len(*broadcast) == 0 && len(*connect) == 0 {
+		log.Fatal("Must specify broadcast or connect")
+	}
+
+	if len(*broadcast) != 0 && len(*connect) != 0 {
+		log.Fatal("Cannot specify broadcast and connect")
+	}
+
 	macbyte := MacToBytesOrDie(*mac)
-	broadcast := MacToBytesOrDie("ff:ff:ff:ff:ff:ff")
+	macbroad := MacToBytesOrDie("ff:ff:ff:ff:ff:ff")
 
-	tap, err := NewTapDevice(*mac, *destination)
-	if err != nil {
-		log.Fatal(err)
+	if len(*broadcast) != 0 {
+		eth, err := ConnectEthDevice(*dev)
+		if err != nil {
+			log.Fatal(err)
+		}
+		filtered_eth := NewFilterPacket(eth, macbroad, macbyte)
+		ln, err := NewListener(*broadcast)
+		if err != nil {
+			log.Fatal(err)
+		}
+		go SendPackets(PacketLogger{ln}, eth)
+		go SendPackets(PacketLogger{filtered_eth}, ln)
+	} else {
+		tap, err := NewTapDevice(*mac, *dev)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer tap.Close()
+		c, err := NewDialer(*connect)
+		if err != nil {
+			log.Fatal(err)
+		}
+		go SendPackets(PacketLogger{tap}, c)
+		go SendPackets(PacketLogger{c}, tap)
 	}
-	defer tap.Close()
-
-	eth, err := ConnectEthDevice(*source)
-	if err != nil {
-		log.Fatal(err)
-	}
-	filtered_eth := NewFilterPacket(eth, broadcast, macbyte)
-
-	go SendPackets(PacketLogger{tap}, eth)
-	go SendPackets(PacketLogger{filtered_eth}, tap)
-
 	fmt.Scanln()
 }
