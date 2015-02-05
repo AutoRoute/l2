@@ -1,4 +1,4 @@
-package main
+package l2
 
 import (
 	"encoding/binary"

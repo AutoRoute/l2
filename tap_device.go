@@ -1,4 +1,4 @@
-package main
+package l2
 
 import (
 	"code.google.com/p/tuntap"
