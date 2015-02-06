@@ -20,6 +20,7 @@ socklen_t LLSize() {
 */
 import "C"
 
+// Represents an existing networking interface on the system.
 type EthDevice struct {
 	dev  C.int
 	name string
@@ -30,6 +31,7 @@ func (e *EthDevice) String() string {
 	return "EthDevice{" + e.name + "}"
 }
 
+// Opens a connection to an existing networking interface on the system.
 func ConnectEthDevice(device string) (*EthDevice, error) {
 	sock, err := C.socket(C.AF_PACKET, C.SOCK_RAW, C.int(C.htons(C.ETH_P_ALL)))
 	if err != nil {
@@ -55,7 +57,7 @@ func ConnectEthDevice(device string) (*EthDevice, error) {
 	return &EthDevice{sock, device, C.int(i.Index)}, nil
 }
 
-func (e *EthDevice) ReadPacket() ([]byte, error) {
+func (e *EthDevice) ReadFrame() ([]byte, error) {
 	buffer := [1523]byte{}
 	n, err := C.recvfrom(e.dev, unsafe.Pointer(&buffer[0]), C.size_t(1523), 0, nil, nil)
 	if err != nil {
@@ -64,7 +66,7 @@ func (e *EthDevice) ReadPacket() ([]byte, error) {
 	return buffer[0:n], nil
 }
 
-func (e *EthDevice) WritePacket(data []byte) error {
+func (e *EthDevice) WriteFrame(data []byte) error {
 	socket_address := C.struct_sockaddr_ll{}
 	socket_address.sll_ifindex = e.num
 	socket_address.sll_halen = C.ETH_ALEN

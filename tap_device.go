@@ -6,6 +6,9 @@ import (
 	"os/exec"
 )
 
+// A Tap Device is a new device that this program has created. In this case
+// the normal semantics are inverted, in that frames sent to the device
+// are what this interface will read and vice versa.
 type TapDevice struct {
 	dev *tuntap.Interface
 }
@@ -45,7 +48,7 @@ func (t *TapDevice) Close() {
 	t.dev.Close()
 }
 
-func (t *TapDevice) ReadPacket() ([]byte, error) {
+func (t *TapDevice) ReadFrame() ([]byte, error) {
 	p, err := t.dev.ReadPacket()
 	if err != nil {
 		return nil, err
@@ -53,10 +56,10 @@ func (t *TapDevice) ReadPacket() ([]byte, error) {
 	return p.Packet, nil
 }
 
-func (t *TapDevice) WritePacket(data []byte) error {
+func (t *TapDevice) WriteFrame(data []byte) error {
 	t.dev.WritePacket(
 		&tuntap.Packet{
-			Protocol: int(EthPacket(data).Type()),
+			Protocol: int(EthFrame(data).Type()),
 			Packet:   data})
 	return nil
 }
