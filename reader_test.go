@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	defaultdest   = MacToBytesOrDie("ff:ff:ff:ff:ff:ff")
+	defaultdest  = MacToBytesOrDie("ff:ff:ff:ff:ff:ff")
 	defaultframe = NewEthFrame(defaultdest, MacToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
 	altframe     = NewEthFrame(
 		MacToBytesOrDie("aa:bb:cc:dd:ee:00"), MacToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
