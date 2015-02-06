@@ -6,6 +6,8 @@ import (
 	"net"
 )
 
+// This type is a generic wrapper around a io.ReadWriteCloser which allows
+// ethernet frames to be tunneled over it.
 type SocketDevice struct {
 	io.ReadWriteCloser
 }
@@ -24,7 +26,7 @@ func NewDialer(address string) (*SocketDevice, error) {
 	return &SocketDevice{c}, err
 }
 
-func (s *SocketDevice) WritePacket(data []byte) error {
+func (s *SocketDevice) WriteFrame(data []byte) error {
 	err := binary.Write(s, binary.BigEndian, int16(len(data)))
 	if err != nil {
 		return err
@@ -39,7 +41,7 @@ func (s *SocketDevice) WritePacket(data []byte) error {
 	return nil
 }
 
-func (s *SocketDevice) ReadPacket() ([]byte, error) {
+func (s *SocketDevice) ReadFrame() ([]byte, error) {
 	var size int16
 	err := binary.Read(s, binary.BigEndian, &size)
 	if err != nil {

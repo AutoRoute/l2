@@ -6,33 +6,34 @@ import (
 	"fmt"
 )
 
-// FilterPacket is a PacketReader which only allows through packets which match the list of
-// packets is is supplied with.
-type FilterPacket struct {
+// FilterFrame is a FrameReader which only allows through frames which match the list of
+// frames is is supplied with.
+type FilterFrame struct {
 	mac    [][]byte
-	device PacketReader
+	device FrameReader
 }
 
-func NewFilterPacket(dev PacketReader, mac ...[]byte) *FilterPacket {
-	return &FilterPacket{mac, dev}
+// Construct a filter which only allows through the specified mac addresses
+func NewFilterFrame(dev FrameReader, mac ...[]byte) *FilterFrame {
+	return &FilterFrame{mac, dev}
 }
 
-func (f FilterPacket) ReadPacket() ([]byte, error) {
+func (f FilterFrame) ReadFrame() ([]byte, error) {
 	for {
-		p, err := f.device.ReadPacket()
+		p, err := f.device.ReadFrame()
 		if err != nil {
 			return p, err
 		}
 		for _, mac := range f.mac {
-			if bytes.Equal(EthPacket(p).Destination(), mac) {
+			if bytes.Equal(EthFrame(p).Destination(), mac) {
 				return p, nil
 			}
 		}
 	}
 }
 
-func (f FilterPacket) String() string {
-	s := "FilterPacket{" + fmt.Sprint(f.device)
+func (f FilterFrame) String() string {
+	s := "FilterFrame{" + fmt.Sprint(f.device)
 	for _, mac := range f.mac {
 		s += ", " + hex.EncodeToString(mac)
 	}

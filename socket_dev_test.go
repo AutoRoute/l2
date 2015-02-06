@@ -12,11 +12,11 @@ func TestSocketDevice(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		p, err := c.ReadPacket()
+		p, err := c.ReadFrame()
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = c.WritePacket(p)
+		err = c.WriteFrame(p)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -27,11 +27,11 @@ func TestSocketDevice(t *testing.T) {
 		t.Fatal(err)
 	}
 	x := "1234567891abcdefgh"
-	err = c.WritePacket([]byte(x))
+	err = c.WriteFrame([]byte(x))
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, err := c.ReadPacket()
+	p, err := c.ReadFrame()
 	if string(p) != x {
 		t.Fatalf("Expected %s got %s", x, string(p))
 	}

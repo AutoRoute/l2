@@ -3,22 +3,22 @@ package l2
 
 import (
 	"encoding/hex"
-	"flag"
-	"fmt"
 	"log"
 	"strings"
 )
 
-// These two interfaces represent the core abstractions in l2forward, with
-// almost everything working on PacketReaders. This is not implemented as a
-// io.Reader because you cannot arbitrarily slice up layer 2 ethernet packets
-// and expect things to keep working
-type PacketReader interface {
-	ReadPacket() ([]byte, error)
+// One of the core interface abstraction in l2forward. This represents
+// something which ethernet frames can be read from. This is distinct from
+// io.Reader because you cannot slice l2 ethernet frames arbitrarily.
+type FrameReader interface {
+	ReadFrame() ([]byte, error)
 }
 
-type PacketWriter interface {
-	WritePacket([]byte) error
+// One of the core interface abstraction in l2forward. This represents
+// something which ethernet frames can be written to. This is distinct from
+// io.Reader because you cannot slice l2 ethernet frames arbitrarily.
+type FrameWriter interface {
+	WriteFrame([]byte) error
 }
 
 // Basic utility function to take a string and turn it into a mac address. Will
@@ -34,15 +34,15 @@ func MacToBytesOrDie(m string) []byte {
 	return b
 }
 
-// Local equivalent of io.Copy, will shove packets from a PacketReader
-// into a PacketWriter
-func SendPackets(source PacketReader, destination PacketWriter) {
+// Local equivalent of io.Copy, will shove frames from a FrameReader
+// into a FrameWriter
+func SendFrames(source FrameReader, destination FrameWriter) {
 	for {
-		p, err := source.ReadPacket()
+		p, err := source.ReadFrame()
 		if err != nil {
 			log.Fatal("Failure to read from source", source, err)
 		}
-		if destination.WritePacket(p) != nil {
+		if destination.WriteFrame(p) != nil {
 			log.Fatal("Failure to write to", destination, err)
 		}
 	}

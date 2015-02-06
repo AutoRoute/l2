@@ -4,9 +4,10 @@ import (
 	"encoding/binary"
 )
 
-type EthPacket []byte
+// A utility type to make introspecting ethernet frames easier.
+type EthFrame []byte
 
-func NewEthPacket(destination, source []byte, protocol uint16, data []byte) []byte {
+func NewEthFrame(destination, source []byte, protocol uint16, data []byte) []byte {
 	p := make([]byte, 12+2+len(data))
 	copy(p[0:6], destination)
 	copy(p[6:12], source)
@@ -15,14 +16,16 @@ func NewEthPacket(destination, source []byte, protocol uint16, data []byte) []by
 	return p
 }
 
-func (p EthPacket) Destination() []byte {
+func (p EthFrame) Destination() []byte {
 	return p[0:6]
 }
 
-func (p EthPacket) Source() []byte {
+func (p EthFrame) Source() []byte {
 	return p[6:12]
 }
 
-func (p EthPacket) Type() uint16 {
+// The ethernet type. Note that if this is <1504 it is likely a length instead
+// and you are communicating with an extremely non standard ethernet device.
+func (p EthFrame) Type() uint16 {
 	return binary.BigEndian.Uint16(p[12:14])
 }

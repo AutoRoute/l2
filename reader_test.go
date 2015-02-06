@@ -10,14 +10,14 @@ import (
 
 var (
 	defaultdest   = MacToBytesOrDie("ff:ff:ff:ff:ff:ff")
-	defaultpacket = NewEthPacket(defaultdest, MacToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
-	altpacket     = NewEthPacket(
+	defaultframe = NewEthFrame(defaultdest, MacToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
+	altframe     = NewEthFrame(
 		MacToBytesOrDie("aa:bb:cc:dd:ee:00"), MacToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
 )
 
-type testReader []EthPacket
+type testReader []EthFrame
 
-func (t *testReader) ReadPacket() ([]byte, error) {
+func (t *testReader) ReadFrame() ([]byte, error) {
 	if len(*t) > 0 {
 		p := (*t)[0]
 		if len(*t) > 1 {
@@ -27,35 +27,35 @@ func (t *testReader) ReadPacket() ([]byte, error) {
 		}
 		return p, nil
 	}
-	return nil, errors.New("Exhausted testing packets")
+	return nil, errors.New("Exhausted testing frames")
 }
 
 type readerTestCase struct {
-	create    func(PacketReader) PacketReader
-	input     []EthPacket
-	output    []EthPacket
+	create    func(FrameReader) FrameReader
+	input     []EthFrame
+	output    []EthFrame
 	stringrep []string
 }
 
-func createLogger(r PacketReader) PacketReader {
-	return &PacketLogger{r}
+func createLogger(r FrameReader) FrameReader {
+	return &FrameLogger{r}
 }
 
-func createFilter(r PacketReader) PacketReader {
-	return NewFilterPacket(r, defaultdest)
+func createFilter(r FrameReader) FrameReader {
+	return NewFilterFrame(r, defaultdest)
 }
 
 func TestReaders(t *testing.T) {
 	testcases := []readerTestCase{
 		{createLogger,
-			[]EthPacket{defaultpacket},
-			[]EthPacket{defaultpacket},
+			[]EthFrame{defaultframe},
+			[]EthFrame{defaultframe},
 			[]string{"Logger"},
 		},
 		{createFilter,
-			[]EthPacket{defaultpacket, altpacket},
-			[]EthPacket{defaultpacket},
-			[]string{"FilterPacket", "ffffffffffff"},
+			[]EthFrame{defaultframe, altframe},
+			[]EthFrame{defaultframe},
+			[]string{"FilterFrame", "ffffffffffff"},
 		},
 	}
 
@@ -65,7 +65,7 @@ func TestReaders(t *testing.T) {
 
 		// Check for all expected output
 		for _, output := range tc.output {
-			p, err := reader.ReadPacket()
+			p, err := reader.ReadFrame()
 			if err != nil {
 				t.Errorf("Reader %v Expected %v error: %v", reader, output, err)
 			}
@@ -76,7 +76,7 @@ func TestReaders(t *testing.T) {
 
 		// Once no input is left, testReader throws an error which a sane reader
 		// should produce.
-		_, err := reader.ReadPacket()
+		_, err := reader.ReadFrame()
 		if err == nil {
 			t.Errorf("Reader %v Expected error got %v", reader, err)
 		}

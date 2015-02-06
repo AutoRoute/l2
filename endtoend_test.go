@@ -14,7 +14,7 @@ var (
 	dest_mac = "ff:11:22:33:44:55"
 )
 
-func waitForPacket(target []byte, dev PacketReader) bool {
+func waitForFrame(target []byte, dev FrameReader) bool {
 	timeout := time.After(time.Second)
 	for {
 		// Check if we're out of time
@@ -24,16 +24,16 @@ func waitForPacket(target []byte, dev PacketReader) bool {
 		default:
 		}
 
-		pack, err := dev.ReadPacket()
+		frame, err := dev.ReadFrame()
 		if err != nil {
 			log.Print(err)
 			return false
 		}
-		if bytes.Equal(target, pack) {
+		if bytes.Equal(target, frame) {
 			return true
 		}
-		PrintPacket("desired", target)
-		PrintPacket("found", pack)
+		PrintFrame("desired", target)
+		PrintFrame("found", frame)
 	}
 }
 
@@ -51,9 +51,9 @@ func NewDevices() (*TapDevice, *EthDevice, error) {
 	return tap, eth, nil
 }
 
-func NewPacket(dest, src string) []byte {
+func NewFrame(dest, src string) []byte {
 	data := make([]byte, 100)
-	return NewEthPacket(MacToBytesOrDie(dest), MacToBytesOrDie(src), 1, data)
+	return NewEthFrame(MacToBytesOrDie(dest), MacToBytesOrDie(src), 1, data)
 }
 
 func TestEthToTap(t *testing.T) {
@@ -62,12 +62,12 @@ func TestEthToTap(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tap.Close()
-	packet := NewPacket(dest_mac, dev_mac)
-	err = eth.WritePacket(packet)
+	frame := NewFrame(dest_mac, dev_mac)
+	err = eth.WriteFrame(frame)
 	if err != nil {
 		t.Fatal(err)
 	}
-	waitForPacket(packet, tap)
+	waitForFrame(frame, tap)
 }
 
 func TestTapToEth(t *testing.T) {
@@ -76,12 +76,12 @@ func TestTapToEth(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tap.Close()
-	packet := NewPacket(dest_mac, dev_mac)
-	err = tap.WritePacket(packet)
+	frame := NewFrame(dest_mac, dev_mac)
+	err = tap.WriteFrame(frame)
 	if err != nil {
 		t.Fatal(err)
 	}
-	waitForPacket(packet, eth)
+	waitForFrame(frame, eth)
 }
 func TestPrinting(t *testing.T) {
 	tap, eth, err := NewDevices()
