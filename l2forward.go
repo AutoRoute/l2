@@ -21,6 +21,11 @@ type FrameWriter interface {
 	WriteFrame([]byte) error
 }
 
+type FrameReadWriter interface {
+    FrameReader
+    FrameWriter
+}
+
 // Basic utility function to take a string and turn it into a mac address. Will
 // die if the string is not valid.
 func MacToBytesOrDie(m string) []byte {
