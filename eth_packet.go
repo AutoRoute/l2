@@ -29,3 +29,7 @@ func (p EthFrame) Source() []byte {
 func (p EthFrame) Type() uint16 {
 	return binary.BigEndian.Uint16(p[12:14])
 }
+
+func (p EthFrame) Data() []byte {
+	return p[14:]
+}
