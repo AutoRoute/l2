@@ -18,7 +18,7 @@ func NewFilterFrame(dev FrameReader, mac ...[]byte) *FilterFrame {
 	return &FilterFrame{mac, dev}
 }
 
-func (f FilterFrame) ReadFrame() ([]byte, error) {
+func (f FilterFrame) ReadFrame() (EthFrame, error) {
 	for {
 		p, err := f.device.ReadFrame()
 		if err != nil {

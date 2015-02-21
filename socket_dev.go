@@ -26,7 +26,7 @@ func NewDialer(address string) (*SocketDevice, error) {
 	return &SocketDevice{c}, err
 }
 
-func (s *SocketDevice) WriteFrame(data []byte) error {
+func (s *SocketDevice) WriteFrame(data EthFrame) error {
 	err := binary.Write(s, binary.BigEndian, int16(len(data)))
 	if err != nil {
 		return err
@@ -41,13 +41,13 @@ func (s *SocketDevice) WriteFrame(data []byte) error {
 	return nil
 }
 
-func (s *SocketDevice) ReadFrame() ([]byte, error) {
+func (s *SocketDevice) ReadFrame() (EthFrame, error) {
 	var size int16
 	err := binary.Read(s, binary.BigEndian, &size)
 	if err != nil {
 		return nil, err
 	}
-	buffer := make([]byte, size)
+	buffer := EthFrame(make([]byte, size))
 	_, err = io.ReadFull(s, buffer)
 	return buffer, err
 }

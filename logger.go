@@ -11,7 +11,7 @@ type FrameLogger struct {
 	d FrameReader
 }
 
-func (l FrameLogger) ReadFrame() ([]byte, error) {
+func (l FrameLogger) ReadFrame() (EthFrame, error) {
 	for {
 		p, err := l.d.ReadFrame()
 		if err == nil {

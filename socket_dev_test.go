@@ -27,7 +27,7 @@ func TestSocketDevice(t *testing.T) {
 		t.Fatal(err)
 	}
 	x := "1234567891abcdefgh"
-	err = c.WriteFrame([]byte(x))
+	err = c.WriteFrame(EthFrame([]byte(x)))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -51,7 +51,7 @@ func NewDevices() (*TapDevice, *EthDevice, error) {
 	return tap, eth, nil
 }
 
-func NewFrame(dest, src string) []byte {
+func NewFrame(dest, src string) EthFrame {
 	data := make([]byte, 100)
 	return NewEthFrame(MacToBytesOrDie(dest), MacToBytesOrDie(src), 1, data)
 }

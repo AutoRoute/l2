@@ -48,7 +48,7 @@ func (t *TapDevice) Close() {
 	t.dev.Close()
 }
 
-func (t *TapDevice) ReadFrame() ([]byte, error) {
+func (t *TapDevice) ReadFrame() (EthFrame, error) {
 	p, err := t.dev.ReadPacket()
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (t *TapDevice) ReadFrame() ([]byte, error) {
 	return p.Packet, nil
 }
 
-func (t *TapDevice) WriteFrame(data []byte) error {
+func (t *TapDevice) WriteFrame(data EthFrame) error {
 	t.dev.WritePacket(
 		&tuntap.Packet{
 			Protocol: int(EthFrame(data).Type()),

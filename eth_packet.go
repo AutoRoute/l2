@@ -7,13 +7,13 @@ import (
 // A utility type to make introspecting ethernet frames easier.
 type EthFrame []byte
 
-func NewEthFrame(destination, source []byte, protocol uint16, data []byte) []byte {
+func NewEthFrame(destination, source []byte, protocol uint16, data []byte) EthFrame {
 	p := make([]byte, 12+2+len(data))
 	copy(p[0:6], destination)
 	copy(p[6:12], source)
 	binary.BigEndian.PutUint16(p[12:14], protocol)
 	copy(p[14:], data)
-	return p
+	return EthFrame(p)
 }
 
 func (p EthFrame) Destination() []byte {

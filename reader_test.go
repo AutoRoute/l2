@@ -17,7 +17,7 @@ var (
 
 type testReader []EthFrame
 
-func (t *testReader) ReadFrame() ([]byte, error) {
+func (t *testReader) ReadFrame() (EthFrame, error) {
 	if len(*t) > 0 {
 		p := (*t)[0]
 		if len(*t) > 1 {

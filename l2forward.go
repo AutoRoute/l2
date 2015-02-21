@@ -11,14 +11,14 @@ import (
 // something which ethernet frames can be read from. This is distinct from
 // io.Reader because you cannot slice l2 ethernet frames arbitrarily.
 type FrameReader interface {
-	ReadFrame() ([]byte, error)
+	ReadFrame() (EthFrame, error)
 }
 
 // One of the core interface abstraction in l2forward. This represents
 // something which ethernet frames can be written to. This is distinct from
 // io.Reader because you cannot slice l2 ethernet frames arbitrarily.
 type FrameWriter interface {
-	WriteFrame([]byte) error
+	WriteFrame(EthFrame) error
 }
 
 type FrameReadWriter interface {

@@ -57,7 +57,7 @@ func ConnectEthDevice(device string) (*EthDevice, error) {
 	return &EthDevice{sock, device, C.int(i.Index)}, nil
 }
 
-func (e *EthDevice) ReadFrame() ([]byte, error) {
+func (e *EthDevice) ReadFrame() (EthFrame, error) {
 	buffer := [1523]byte{}
 	n, err := C.recvfrom(e.dev, unsafe.Pointer(&buffer[0]), C.size_t(1523), 0, nil, nil)
 	if err != nil {
@@ -66,7 +66,7 @@ func (e *EthDevice) ReadFrame() ([]byte, error) {
 	return buffer[0:n], nil
 }
 
-func (e *EthDevice) WriteFrame(data []byte) error {
+func (e *EthDevice) WriteFrame(data EthFrame) error {
 	socket_address := C.struct_sockaddr_ll{}
 	socket_address.sll_ifindex = e.num
 	socket_address.sll_halen = C.ETH_ALEN
