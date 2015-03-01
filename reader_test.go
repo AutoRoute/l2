@@ -55,7 +55,7 @@ func TestReaders(t *testing.T) {
 		{createFilter,
 			[]EthFrame{defaultframe, altframe},
 			[]EthFrame{defaultframe},
-			[]string{"FilterFrame", "ffffffffffff"},
+			[]string{"filterReader", "ffffffffffff"},
 		},
 	}
 

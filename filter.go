@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-// FilterFrame is a FrameReader which only allows through frames which match the list of
+// filterReader is a FrameReader which only allows through frames which match the list of
 // frames is is supplied with.
 type filterReader struct {
 	mac    [][]byte
@@ -33,7 +33,7 @@ func (f filterReader) ReadFrame() (EthFrame, error) {
 }
 
 func (f filterReader) String() string {
-	s := "FilterFrame{" + fmt.Sprint(f.device)
+	s := "filterReader{" + fmt.Sprint(f.device)
 	for _, mac := range f.mac {
 		s += ", " + hex.EncodeToString(mac)
 	}
