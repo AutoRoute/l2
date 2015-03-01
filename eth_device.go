@@ -32,7 +32,7 @@ func (e *existingDevice) String() string {
 }
 
 // Opens a connection to an existing networking interface on the system.
-func ConnectExistingDevice(device string) (*existingDevice, error) {
+func ConnectExistingDevice(device string) (FrameReadWriter, error) {
 	sock, err := C.socket(C.AF_PACKET, C.SOCK_RAW, C.int(C.htons(C.ETH_P_ALL)))
 	if err != nil {
 		return nil, err

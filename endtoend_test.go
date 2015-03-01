@@ -2,6 +2,7 @@ package l2
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"strings"
 	"testing"
@@ -37,7 +38,7 @@ func waitForFrame(target []byte, dev FrameReader) bool {
 	}
 }
 
-func NewDevices() (*TapDevice, *existingDevice, error) {
+func NewDevices() (*TapDevice, FrameReadWriter, error) {
 	tap, err := NewTapDevice(dev_mac, dev_name)
 	if err != nil {
 		return nil, nil, err
@@ -89,10 +90,10 @@ func TestPrinting(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tap.Close()
-	if !strings.Contains(tap.String(), "TapDevice") {
-		t.Fatal("Missing TapDevice from", tap.String())
+	if !strings.Contains(fmt.Sprint(tap), "TapDevice") {
+		t.Fatal("Missing TapDevice from", tap)
 	}
-	if !strings.Contains(eth.String(), "existingDevice") {
-		t.Fatal("Missing existingDevice from", eth.String())
+	if !strings.Contains(fmt.Sprint(eth), "existingDevice") {
+		t.Fatal("Missing existingDevice from", eth)
 	}
 }
