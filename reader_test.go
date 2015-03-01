@@ -42,7 +42,7 @@ func createLogger(r FrameReader) FrameReader {
 }
 
 func createFilter(r FrameReader) FrameReader {
-	return NewFilterFrame(r, defaultdest)
+	return NewFilterReader(r, defaultdest)
 }
 
 func TestReaders(t *testing.T) {

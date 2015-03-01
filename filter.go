@@ -14,7 +14,7 @@ type filterReader struct {
 }
 
 // Construct a filter which only allows through the specified mac addresses
-func NewFilterFrame(dev FrameReader, mac ...[]byte) FrameReader {
+func NewFilterReader(dev FrameReader, mac ...[]byte) FrameReader {
 	return filterReader{mac, dev}
 }
 
