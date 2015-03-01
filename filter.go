@@ -8,17 +8,17 @@ import (
 
 // filterReader is a FrameReader which only allows through frames which match the list of
 // frames is is supplied with.
-type filterReader struct {
+type filter struct {
 	mac    [][]byte
 	device FrameReader
 }
 
 // Construct a filter which only allows through the specified mac addresses
 func NewFilter(dev FrameReader, mac ...[]byte) FrameReader {
-	return filterReader{mac, dev}
+	return filter{mac, dev}
 }
 
-func (f filterReader) ReadFrame() (EthFrame, error) {
+func (f filter) ReadFrame() (EthFrame, error) {
 	for {
 		p, err := f.device.ReadFrame()
 		if err != nil {
@@ -32,7 +32,7 @@ func (f filterReader) ReadFrame() (EthFrame, error) {
 	}
 }
 
-func (f filterReader) String() string {
+func (f filter) String() string {
 	s := "Filter{" + fmt.Sprint(f.device)
 	for _, mac := range f.mac {
 		s += ", " + hex.EncodeToString(mac)
