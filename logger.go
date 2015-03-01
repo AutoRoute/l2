@@ -8,15 +8,15 @@ import (
 
 // Construct a logger which logs all frames.
 func NewLogger(d FrameReader) FrameReader {
-	return FrameLogger{d}
+	return logger{d}
 }
 
 // Logs all frames which transit it.
-type FrameLogger struct {
+type logger struct {
 	D FrameReader
 }
 
-func (l FrameLogger) ReadFrame() (EthFrame, error) {
+func (l logger) ReadFrame() (EthFrame, error) {
 	for {
 		p, err := l.D.ReadFrame()
 		if err == nil {
@@ -28,7 +28,7 @@ func (l FrameLogger) ReadFrame() (EthFrame, error) {
 	}
 }
 
-func (l FrameLogger) String() string {
+func (l logger) String() string {
 	return "Logger{" + fmt.Sprint(l.D) + "}"
 }
 
