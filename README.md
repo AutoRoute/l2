@@ -1,1 +1,3 @@
-Initial attempt at a layer 2 packet forwarder. Note that this will basically only ever run on linux
+A library for manipulating layer two ethernet frames. This currently will only work on linux.
+
+Docs are at godoc.org/github.com/AutoRoute/l2

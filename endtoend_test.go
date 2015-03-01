@@ -2,6 +2,7 @@ package l2
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"strings"
 	"testing"
@@ -37,13 +38,13 @@ func waitForFrame(target []byte, dev FrameReader) bool {
 	}
 }
 
-func NewDevices() (*TapDevice, *EthDevice, error) {
+func NewDevices() (*TapDevice, FrameReadWriter, error) {
 	tap, err := NewTapDevice(dev_mac, dev_name)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	eth, err := ConnectEthDevice(dev_name)
+	eth, err := ConnectExistingDevice(dev_name)
 	if err != nil {
 		tap.Close()
 		return nil, nil, err
@@ -53,7 +54,7 @@ func NewDevices() (*TapDevice, *EthDevice, error) {
 
 func NewFrame(dest, src string) EthFrame {
 	data := make([]byte, 100)
-	return NewEthFrame(MacToBytesOrDie(dest), MacToBytesOrDie(src), 1, data)
+	return NewEthFrame(macToBytesOrDie(dest), macToBytesOrDie(src), 1, data)
 }
 
 func TestEthToTap(t *testing.T) {
@@ -89,10 +90,10 @@ func TestPrinting(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tap.Close()
-	if !strings.Contains(tap.String(), "TapDevice") {
-		t.Fatal("Missing TapDevice from", tap.String())
+	if !strings.Contains(fmt.Sprint(tap), "TapDevice") {
+		t.Fatal("Missing TapDevice from", tap)
 	}
-	if !strings.Contains(eth.String(), "EthDevice") {
-		t.Fatal("Missing EthDevice from", eth.String())
+	if !strings.Contains(fmt.Sprint(eth), "existingDevice") {
+		t.Fatal("Missing existingDevice from", eth)
 	}
 }

@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	defaultdest  = MacToBytesOrDie("ff:ff:ff:ff:ff:ff")
-	defaultframe = NewEthFrame(defaultdest, MacToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
+	defaultdest  = macToBytesOrDie("ff:ff:ff:ff:ff:ff")
+	defaultframe = NewEthFrame(defaultdest, macToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
 	altframe     = NewEthFrame(
-		MacToBytesOrDie("aa:bb:cc:dd:ee:00"), MacToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
+		macToBytesOrDie("aa:bb:cc:dd:ee:00"), macToBytesOrDie("00:00:00:00:00:00"), 1, make([]byte, 100))
 )
 
 type testReader []EthFrame
@@ -37,17 +37,13 @@ type readerTestCase struct {
 	stringrep []string
 }
 
-func createLogger(r FrameReader) FrameReader {
-	return &FrameLogger{r}
-}
-
 func createFilter(r FrameReader) FrameReader {
-	return NewFilterFrame(r, defaultdest)
+	return NewFilter(r, defaultdest)
 }
 
 func TestReaders(t *testing.T) {
 	testcases := []readerTestCase{
-		{createLogger,
+		{NewLogger,
 			[]EthFrame{defaultframe},
 			[]EthFrame{defaultframe},
 			[]string{"Logger"},
@@ -55,7 +51,7 @@ func TestReaders(t *testing.T) {
 		{createFilter,
 			[]EthFrame{defaultframe, altframe},
 			[]EthFrame{defaultframe},
-			[]string{"FilterFrame", "ffffffffffff"},
+			[]string{"Filter", "ffffffffffff"},
 		},
 	}
 

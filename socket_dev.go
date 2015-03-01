@@ -3,30 +3,20 @@ package l2
 import (
 	"encoding/binary"
 	"io"
-	"net"
 )
 
 // This type is a generic wrapper around a io.ReadWriteCloser which allows
 // ethernet frames to be tunneled over it.
-type SocketDevice struct {
-	io.ReadWriteCloser
+type socketDevice struct {
+	io.ReadWriter
 }
 
-func NewListener(address string) (*SocketDevice, error) {
-	ln, err := net.Listen("tcp", address)
-	if err != nil {
-		return nil, err
-	}
-	c, err := ln.Accept()
-	return &SocketDevice{c}, err
+// A utility function to transform a ReadWriter into a FrameReadWriter.
+func WrapReadWriter(rw io.ReadWriter) FrameReadWriter {
+	return &socketDevice{rw}
 }
 
-func NewDialer(address string) (*SocketDevice, error) {
-	c, err := net.Dial("tcp", address)
-	return &SocketDevice{c}, err
-}
-
-func (s *SocketDevice) WriteFrame(data EthFrame) error {
+func (s *socketDevice) WriteFrame(data EthFrame) error {
 	err := binary.Write(s, binary.BigEndian, int16(len(data)))
 	if err != nil {
 		return err
@@ -41,7 +31,7 @@ func (s *SocketDevice) WriteFrame(data EthFrame) error {
 	return nil
 }
 
-func (s *SocketDevice) ReadFrame() (EthFrame, error) {
+func (s *socketDevice) ReadFrame() (EthFrame, error) {
 	var size int16
 	err := binary.Read(s, binary.BigEndian, &size)
 	if err != nil {

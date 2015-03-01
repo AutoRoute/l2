@@ -6,16 +6,21 @@ import (
 	"log"
 )
 
-// Logs all frames which transit it.
-type FrameLogger struct {
-	d FrameReader
+// Construct a logger which logs all frames.
+func NewLogger(d FrameReader) FrameReader {
+	return logger{d}
 }
 
-func (l FrameLogger) ReadFrame() (EthFrame, error) {
+// Logs all frames which transit it.
+type logger struct {
+	D FrameReader
+}
+
+func (l logger) ReadFrame() (EthFrame, error) {
 	for {
-		p, err := l.d.ReadFrame()
+		p, err := l.D.ReadFrame()
 		if err == nil {
-			PrintFrame(fmt.Sprint(l.d), p)
+			PrintFrame(fmt.Sprint(l.D), p)
 		} else {
 			log.Print("Err reading frame:", err)
 		}
@@ -23,8 +28,8 @@ func (l FrameLogger) ReadFrame() (EthFrame, error) {
 	}
 }
 
-func (l FrameLogger) String() string {
-	return "Logger{" + fmt.Sprint(l.d) + "}"
+func (l logger) String() string {
+	return "Logger{" + fmt.Sprint(l.D) + "}"
 }
 
 // Utility function to pretty print a ethernet frame plus a header

@@ -2,7 +2,32 @@ package l2
 
 import (
 	"encoding/binary"
+	"encoding/hex"
+	"errors"
+	"fmt"
+	"log"
+	"strings"
 )
+
+// Basic utility function to take a string and turn it into a mac address.
+func MacToBytes(m string) ([]byte, error) {
+	b, err := hex.DecodeString(strings.Replace(m, ":", "", -1))
+	if err != nil {
+		return nil, err
+	}
+	if len(b) != 6 {
+		return nil, errors.New(fmt.Sprint("Expected mac of length 6 bytes got %d", len(b)))
+	}
+	return b, nil
+}
+
+func macToBytesOrDie(m string) []byte {
+	b, err := MacToBytes(m)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return b
+}
 
 // A utility type to make introspecting ethernet frames easier.
 type EthFrame []byte
