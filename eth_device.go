@@ -21,18 +21,18 @@ socklen_t LLSize() {
 import "C"
 
 // Represents an existing networking interface on the system.
-type EthDevice struct {
+type existingDevice struct {
 	dev  C.int
 	name string
 	num  C.int
 }
 
-func (e *EthDevice) String() string {
-	return "EthDevice{" + e.name + "}"
+func (e *existingDevice) String() string {
+	return "existingDevice{" + e.name + "}"
 }
 
 // Opens a connection to an existing networking interface on the system.
-func ConnectEthDevice(device string) (*EthDevice, error) {
+func ConnectExistingDevice(device string) (*existingDevice, error) {
 	sock, err := C.socket(C.AF_PACKET, C.SOCK_RAW, C.int(C.htons(C.ETH_P_ALL)))
 	if err != nil {
 		return nil, err
@@ -54,10 +54,10 @@ func ConnectEthDevice(device string) (*EthDevice, error) {
 	if ok != 0 {
 		return nil, errors.New("bind return !ok")
 	}
-	return &EthDevice{sock, device, C.int(i.Index)}, nil
+	return &existingDevice{sock, device, C.int(i.Index)}, nil
 }
 
-func (e *EthDevice) ReadFrame() (EthFrame, error) {
+func (e *existingDevice) ReadFrame() (EthFrame, error) {
 	buffer := [1523]byte{}
 	n, err := C.recvfrom(e.dev, unsafe.Pointer(&buffer[0]), C.size_t(1523), 0, nil, nil)
 	if err != nil {
@@ -66,7 +66,7 @@ func (e *EthDevice) ReadFrame() (EthFrame, error) {
 	return buffer[0:n], nil
 }
 
-func (e *EthDevice) WriteFrame(data EthFrame) error {
+func (e *existingDevice) WriteFrame(data EthFrame) error {
 	socket_address := C.struct_sockaddr_ll{}
 	socket_address.sll_ifindex = e.num
 	socket_address.sll_halen = C.ETH_ALEN

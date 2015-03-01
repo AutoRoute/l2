@@ -37,13 +37,13 @@ func waitForFrame(target []byte, dev FrameReader) bool {
 	}
 }
 
-func NewDevices() (*TapDevice, *EthDevice, error) {
+func NewDevices() (*TapDevice, *existingDevice, error) {
 	tap, err := NewTapDevice(dev_mac, dev_name)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	eth, err := ConnectEthDevice(dev_name)
+	eth, err := ConnectExistingDevice(dev_name)
 	if err != nil {
 		tap.Close()
 		return nil, nil, err
@@ -92,7 +92,7 @@ func TestPrinting(t *testing.T) {
 	if !strings.Contains(tap.String(), "TapDevice") {
 		t.Fatal("Missing TapDevice from", tap.String())
 	}
-	if !strings.Contains(eth.String(), "EthDevice") {
-		t.Fatal("Missing EthDevice from", eth.String())
+	if !strings.Contains(eth.String(), "existingDevice") {
+		t.Fatal("Missing existingDevice from", eth.String())
 	}
 }
