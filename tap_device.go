@@ -6,9 +6,10 @@ import (
 	"os/exec"
 )
 
-// A Tap Device is a new device that this program has created. In this case
+// A Tap Device is a new networking device that this program has created. In this case
 // the normal semantics are inverted, in that frames sent to the device
-// are what this interface will read and vice versa.
+// are what this interface will read and vice versa. Note that this device must be closed
+// when you are done using it.
 type TapDevice struct {
 	dev *tuntap.Interface
 }
@@ -44,8 +45,8 @@ func (t *TapDevice) String() string {
 	return "TapDevice{" + t.dev.Name() + "}"
 }
 
-func (t *TapDevice) Close() {
-	t.dev.Close()
+func (t *TapDevice) Close() error {
+	return t.dev.Close()
 }
 
 func (t *TapDevice) ReadFrame() (EthFrame, error) {
