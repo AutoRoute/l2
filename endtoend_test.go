@@ -38,7 +38,7 @@ func waitForFrame(target []byte, dev FrameReader) bool {
 	}
 }
 
-func NewDevices() (*TapDevice, FrameReadWriter, error) {
+func NewDevices() (FrameReadWriteCloser, FrameReadWriter, error) {
 	tap, err := NewTapDevice(dev_mac, dev_name)
 	if err != nil {
 		return nil, nil, err

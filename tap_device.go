@@ -6,15 +6,15 @@ import (
 	"os/exec"
 )
 
+type tapDevice struct {
+	dev *tuntap.Interface
+}
+
 // A Tap Device is a new networking device that this program has created. In this case
 // the normal semantics are inverted, in that frames sent to the device
 // are what this interface will read and vice versa. Note that this device must be closed
 // when you are done using it.
-type TapDevice struct {
-	dev *tuntap.Interface
-}
-
-func NewTapDevice(mac, dev string) (*TapDevice, error) {
+func NewTapDevice(mac, dev string) (FrameReadWriteCloser, error) {
 	fd, err := tuntap.Open(dev, tuntap.DevTap)
 	if err != nil {
 		return nil, err
@@ -38,18 +38,18 @@ func NewTapDevice(mac, dev string) (*TapDevice, error) {
 		log.Print("Command output:", string(output))
 		return nil, err
 	}
-	return &TapDevice{fd}, nil
+	return &tapDevice{fd}, nil
 }
 
-func (t *TapDevice) String() string {
+func (t *tapDevice) String() string {
 	return "TapDevice{" + t.dev.Name() + "}"
 }
 
-func (t *TapDevice) Close() error {
+func (t *tapDevice) Close() error {
 	return t.dev.Close()
 }
 
-func (t *TapDevice) ReadFrame() (EthFrame, error) {
+func (t *tapDevice) ReadFrame() (EthFrame, error) {
 	p, err := t.dev.ReadPacket()
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (t *TapDevice) ReadFrame() (EthFrame, error) {
 	return p.Packet, nil
 }
 
-func (t *TapDevice) WriteFrame(data EthFrame) error {
+func (t *tapDevice) WriteFrame(data EthFrame) error {
 	t.dev.WritePacket(
 		&tuntap.Packet{
 			Protocol: int(EthFrame(data).Type()),

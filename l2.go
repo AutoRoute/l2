@@ -2,6 +2,10 @@
 // at the layer two networking level.
 package l2
 
+import (
+	"io"
+)
+
 // Something which you can read ethernet frames from. This is distinct from
 // io.Reader because you cannot slice l2 ethernet frames arbitrarily.
 type FrameReader interface {
@@ -17,6 +21,12 @@ type FrameWriter interface {
 type FrameReadWriter interface {
 	FrameReader
 	FrameWriter
+}
+
+type FrameReadWriteCloser interface {
+	FrameReader
+	FrameWriter
+	io.Closer
 }
 
 // Local equivalent of io.Copy, will shove frames from a FrameReader
