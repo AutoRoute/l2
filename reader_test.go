@@ -37,17 +37,13 @@ type readerTestCase struct {
 	stringrep []string
 }
 
-func createLogger(r FrameReader) FrameReader {
-	return &FrameLogger{r}
-}
-
 func createFilter(r FrameReader) FrameReader {
 	return NewFilter(r, defaultdest)
 }
 
 func TestReaders(t *testing.T) {
 	testcases := []readerTestCase{
-		{createLogger,
+		{NewLogger,
 			[]EthFrame{defaultframe},
 			[]EthFrame{defaultframe},
 			[]string{"Logger"},
@@ -55,7 +51,7 @@ func TestReaders(t *testing.T) {
 		{createFilter,
 			[]EthFrame{defaultframe, altframe},
 			[]EthFrame{defaultframe},
-			[]string{"filterReader", "ffffffffffff"},
+			[]string{"Filter", "ffffffffffff"},
 		},
 	}
 

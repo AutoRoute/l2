@@ -6,6 +6,11 @@ import (
 	"log"
 )
 
+// Construct a logger which logs all frames.
+func NewLogger(d FrameReader) FrameReader {
+	return FrameLogger{d}
+}
+
 // Logs all frames which transit it.
 type FrameLogger struct {
 	D FrameReader

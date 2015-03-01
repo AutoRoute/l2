@@ -33,7 +33,7 @@ func (f filterReader) ReadFrame() (EthFrame, error) {
 }
 
 func (f filterReader) String() string {
-	s := "filterReader{" + fmt.Sprint(f.device)
+	s := "Filter{" + fmt.Sprint(f.device)
 	for _, mac := range f.mac {
 		s += ", " + hex.EncodeToString(mac)
 	}
