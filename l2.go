@@ -1,4 +1,5 @@
-// Program l2forward is a simple binary to foward networking devies at the layer two level.
+// Package l2 is a set of utility functions for manipulating network devices
+// at the layer two networking level.
 package l2
 
 import (
