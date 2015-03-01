@@ -54,7 +54,7 @@ func NewDevices() (*TapDevice, FrameReadWriter, error) {
 
 func NewFrame(dest, src string) EthFrame {
 	data := make([]byte, 100)
-	return NewEthFrame(MacToBytesOrDie(dest), MacToBytesOrDie(src), 1, data)
+	return NewEthFrame(macToBytesOrDie(dest), macToBytesOrDie(src), 1, data)
 }
 
 func TestEthToTap(t *testing.T) {
