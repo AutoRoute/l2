@@ -58,9 +58,8 @@ func (t *tapDevice) ReadFrame() (EthFrame, error) {
 }
 
 func (t *tapDevice) WriteFrame(data EthFrame) error {
-	t.dev.WritePacket(
+	return t.dev.WritePacket(
 		&tuntap.Packet{
 			Protocol: int(EthFrame(data).Type()),
 			Packet:   data})
-	return nil
 }
