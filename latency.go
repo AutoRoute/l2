@@ -21,7 +21,7 @@ type deviceWithLatency struct {
 }
 
 // Basically initializes latency and then delegates to the tapDevice version of
-// NewTapDevice.
+// NewTapDevice. For bandwidth parameters, 0 means no limitation.
 // Args:
 //	mac: MAC address of the device.
 //  dev: A name for the device.
@@ -55,6 +55,11 @@ func (t *deviceWithLatency) ReadFrame() (EthFrame, error) {
 		return nil, err
 	}
 
+	if t.receive_bandwidth == 0 {
+		// No limitation.
+		return frame, nil
+	}
+
 	// Compute how long it took us.
 	end_time := time.Now()
 	elapsed := end_time.Sub(start_time)
@@ -78,10 +83,12 @@ func (t *deviceWithLatency) ReadFrame() (EthFrame, error) {
 // Returns:
 //	Error.
 func (t *deviceWithLatency) WriteFrame(data EthFrame) error {
-	// Wait the requisite latency.
-	target_latency := float32(t.last_write_size) / float32(t.send_bandwidth)
-	t.last_write_size = len(data)
-	time.Sleep(time.Duration(target_latency * float32(time.Second)))
+	if t.send_bandwidth != 0 {
+		// Wait the requisite latency.
+		target_latency := float32(t.last_write_size) / float32(t.send_bandwidth)
+		t.last_write_size = len(data)
+		time.Sleep(time.Duration(target_latency * float32(time.Second)))
+	}
 
 	return t.dev.WriteFrame(data)
 }

@@ -120,7 +120,7 @@ func TestEthToTap(t *testing.T) {
 
 // Test sending packets with restricted bandwidth.
 func TestSendingBandwidth(t *testing.T) {
-	tap, _, err := NewDevicesWithBandwidth(10000, 10000)
+	tap, _, err := NewDevicesWithBandwidth(10000, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,7 +151,7 @@ func TestSendingBandwidth(t *testing.T) {
 
 // Test receiving packets with restricted bandwidth.
 func TestReceivingBandwidth(t *testing.T) {
-	tap, eth, err := NewDevicesWithBandwidth(10000, 10000)
+	tap, eth, err := NewDevicesWithBandwidth(0, 10000)
 	if err != nil {
 		t.Fatal(err)
 	}
