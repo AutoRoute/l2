@@ -70,13 +70,18 @@ func NewDevices() (FrameReadWriteCloser, FrameReadWriter, error) {
 func NewDevicesWithBandwidth(send_bandwidth,
 	receive_bandwidth int) (FrameReadWriteCloser,
 	FrameReadWriter, error) {
-	tap, err := NewTapDeviceWithLatency(dev_mac, dev_name, send_bandwidth,
+	tap, err := NewTapDevice(dev_mac, dev_name)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	latency, err := NewDeviceWithLatency(tap, send_bandwidth,
 		receive_bandwidth)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return makeEth(tap)
+	return makeEth(latency)
 }
 
 // Makes an eth device and connects an existing tap device to it.
