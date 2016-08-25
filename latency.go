@@ -1,7 +1,6 @@
 package l2
 
 import (
-	"log"
 	"time"
 )
 
@@ -30,19 +29,14 @@ type deviceWithLatency struct {
 //  receive_bandwidth: Maximum number of incoming bytes per second.
 // Returns:
 //	The new tap device, error.
-func NewTapDeviceWithLatency(mac, dev string, send_bandwidth,
-	receive_bandwidth int) (FrameReadWriteCloser, error) {
-	tap, err := NewTapDevice(mac, dev)
-	if err != nil {
-		return nil, err
-	}
-
-	wrapped_tap := deviceWithLatency{
-		dev:               tap,
+func NewDeviceWithLatency(dev FrameReadWriteCloser, send_bandwidth,
+	receive_bandwidth int) FrameReadWriteCloser {
+	d := deviceWithLatency{
+		dev:               dev,
 		send_bandwidth:    send_bandwidth,
 		receive_bandwidth: receive_bandwidth,
 	}
-	return &wrapped_tap, nil
+	return &d
 }
 
 // Reads a frame from the tap device.
@@ -72,9 +66,6 @@ func (t *deviceWithLatency) ReadFrame() (EthFrame, error) {
 
 	// We want to have the exact latency, so wait the rest of the time.
 	to_wait := target_latency*float32(time.Second) - float32(elapsed)
-	if to_wait < 0 {
-		log.Print("Receiving packet took longer than latency!")
-	}
 	time.Sleep(time.Duration(to_wait))
 
 	return frame, nil

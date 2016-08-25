@@ -70,13 +70,14 @@ func NewDevices() (FrameReadWriteCloser, FrameReadWriter, error) {
 func NewDevicesWithBandwidth(send_bandwidth,
 	receive_bandwidth int) (FrameReadWriteCloser,
 	FrameReadWriter, error) {
-	tap, err := NewTapDeviceWithLatency(dev_mac, dev_name, send_bandwidth,
-		receive_bandwidth)
+	tap, err := NewTapDevice(dev_mac, dev_name)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return makeEth(tap)
+	latency := NewDeviceWithLatency(tap, send_bandwidth,
+		receive_bandwidth)
+	return makeEth(latency)
 }
 
 // Makes an eth device and connects an existing tap device to it.
@@ -144,7 +145,7 @@ func TestSendingBandwidth(t *testing.T) {
 	elapsed := float64(end_time.Sub(start_time)) / float64(time.Second)
 	bandwidth := float64(bytes_written) / elapsed
 
-	if math.Abs(10000-bandwidth) > 50 {
+	if math.Abs(10000-bandwidth) > 500 {
 		t.Fatalf("Got %f b/s of bandwidth, expected 10000.", bandwidth)
 	}
 }
@@ -186,7 +187,7 @@ func TestReceivingBandwidth(t *testing.T) {
 	elapsed := float64(end_time.Sub(start_time)) / float64(time.Second)
 	bandwidth := float64(bytes_read) / elapsed
 
-	if math.Abs(10000-bandwidth) > 50 {
+	if math.Abs(10000-bandwidth) > 500 {
 		t.Fatalf("Got %f b/s of bandwidth, expected 10000.", bandwidth)
 	}
 }
