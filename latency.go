@@ -30,14 +30,13 @@ type deviceWithLatency struct {
 // Returns:
 //	The new tap device, error.
 func NewDeviceWithLatency(dev FrameReadWriteCloser, send_bandwidth,
-	receive_bandwidth int) (FrameReadWriteCloser, error) {
-
+	receive_bandwidth int) FrameReadWriteCloser {
 	d := deviceWithLatency{
 		dev:               dev,
 		send_bandwidth:    send_bandwidth,
 		receive_bandwidth: receive_bandwidth,
 	}
-	return &d, nil
+	return &d
 }
 
 // Reads a frame from the tap device.

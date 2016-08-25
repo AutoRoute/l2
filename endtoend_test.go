@@ -75,12 +75,8 @@ func NewDevicesWithBandwidth(send_bandwidth,
 		return nil, nil, err
 	}
 
-	latency, err := NewDeviceWithLatency(tap, send_bandwidth,
+	latency := NewDeviceWithLatency(tap, send_bandwidth,
 		receive_bandwidth)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	return makeEth(latency)
 }
 
@@ -149,7 +145,7 @@ func TestSendingBandwidth(t *testing.T) {
 	elapsed := float64(end_time.Sub(start_time)) / float64(time.Second)
 	bandwidth := float64(bytes_written) / elapsed
 
-	if math.Abs(10000-bandwidth) > 50 {
+	if math.Abs(10000-bandwidth) > 500 {
 		t.Fatalf("Got %f b/s of bandwidth, expected 10000.", bandwidth)
 	}
 }
@@ -191,7 +187,7 @@ func TestReceivingBandwidth(t *testing.T) {
 	elapsed := float64(end_time.Sub(start_time)) / float64(time.Second)
 	bandwidth := float64(bytes_read) / elapsed
 
-	if math.Abs(10000-bandwidth) > 50 {
+	if math.Abs(10000-bandwidth) > 500 {
 		t.Fatalf("Got %f b/s of bandwidth, expected 10000.", bandwidth)
 	}
 }
